@@ -257,3 +257,7 @@ body {
   margin-bottom: 44px;
 
 }
+
+.page-btn.is-hidden {
+  display: none;
+}
