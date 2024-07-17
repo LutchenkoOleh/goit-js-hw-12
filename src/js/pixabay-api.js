@@ -1,7 +1,11 @@
 import axios from 'axios';
 
 
-export async function searchImg(query) {
+export async function searchImg({
+  q = '',
+  page = 1,
+  per_page = 15,
+} = {}) {
 
 
   const API_KEY = '44806225-40e07737f22f709bd193bb0f7';
@@ -10,13 +14,14 @@ export async function searchImg(query) {
   const orientation = 'horizontal';
   const safeSearch = true;
 
-  let currentPage = 1;
-  try {
-    const response = await axios.get(`${URL}&q=${query}&image_type=${imageType}&orientation=${orientation}&safesearch=${safeSearch}&page=${currentPage}&per_page=15`)
-    return response.data;
-  } catch (error) {
-    console.error(error)
-  }
+
+  return await axios.get(`${URL}&image_type=${imageType}&orientation=${orientation}&safesearch=${safeSearch}`,
+    {
+      params: {
+        q,
+        page,
+        per_page
+      }
+    })
+    .then(({ data }) => data)
 }
-
-

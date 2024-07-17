@@ -261,3 +261,7 @@ body {
 .page-btn.is-hidden {
   display: none;
 }
+
+.sl-overlay {
+  background-color: #2e2f42;
+}

@@ -10,6 +10,15 @@ import { renderImg } from './js/render-functions'
 import buttonService from "./js/loadMore"
 
 
+
+const params = {
+  q: '',
+  page: 1,
+  per_page: 15,
+  maxPage: ''
+}
+
+
 const spin = document.querySelector('.loader')
 spin.style.opacity = 0;
 
@@ -22,16 +31,17 @@ const form = document.querySelector('.form');
 form.addEventListener("submit", handelSearch);
 
 async function handelSearch(e) {
-
   document.querySelector('.gallery').innerHTML = "";
+  params.page = 1;
 
   e.preventDefault();
   spin.style.opacity = 1;
 
-  const formTarget = e.currentTarget;
-  const queryValue = formTarget.elements.query.value.trim().toLowerCase();
 
-  if (queryValue.length <= 0) {
+  const formTarget = e.currentTarget;
+  params.q = formTarget.elements.query.value.trim().toLowerCase();
+
+  if (params.q.length <= 0) {
     iziToast.show({
       backgroundColor: '#ef4040',
       messageColor: '#fff',
@@ -50,16 +60,29 @@ async function handelSearch(e) {
   buttonService.disable(btnMore)
 
   try {
+    const { hits,
+      totalHits } = await searchImg(params)
+    returnImg({ hits })
 
-    await searchImg(queryValue)
-      .then(returnImg)
+    params.maxPage = Math.ceil(totalHits / params.per_page);
+
+    if (hits.length > 0 && hits.length !== totalHits) {
+      buttonService.enable(btnMore);
+      btnMore.addEventListener('click', handleLoadMore)
+    } else {
+      buttonService.hide(btnMore)
+    }
 
   } catch (error) {
     fetchError(error)
+  } finally {
+    form.reset();
   }
-
 }
 
+
+
+// !SIMPLE LIGHTBOX
 let galleryShow = new SimpleLightbox('.gallery a', {
   captions: true,
   captionType: 'attr',
@@ -70,29 +93,21 @@ let galleryShow = new SimpleLightbox('.gallery a', {
 
 
 // !RETURN IMG
-function returnImg(data) {
-  const results = data.hits;
-  const totalRes = data.totalHits;
+async function returnImg(data) {
 
-  if (totalRes === 0) {
-    iziToast.error({
-      backgroundColor: '#ef4040',
-      messageColor: '#fff',
-      messageSize: '16px',
-      position: 'topRight',
-      message: 'Sorry, there are no images matching your search query. Please try again!'
-    })
+  const { hits,
+    totalHits } = await searchImg(params)
+
+  if (totalHits === 0) {
+    fetchError()
   } else {
-    results.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
-      renderImg(webformatURL, largeImageURL, tags, likes, views, comments, downloads);
-    })
+    renderImg(hits)
   }
 
   galleryShow.on('show.simplelightbox', function () {
   });
 
   galleryShow.refresh()
-
   spin.style.opacity = '0';
 }
 
@@ -106,4 +121,34 @@ function fetchError() {
     position: 'topRight',
     message: 'Sorry, there are no images matching your search query. Please try again!'
   })
+}
+
+
+
+// !HANDLE LOAD MORE
+async function handleLoadMore() {
+  params.page += 1;
+  buttonService.disable(btnMore);
+
+  try {
+
+    const { hits } = await searchImg(params)
+    returnImg({ hits })
+
+  } catch (error) {
+    fetchError(error)
+  } finally {
+    buttonService.enable(btnMore);
+    if (params.page === params.maxPage) {
+      buttonService.hide(btnMore)
+      btnMore.removeEventListener('click', handleLoadMore)
+      iziToast.show({
+        backgroundColor: '#eecf04',
+        messageColor: '#fff',
+        messageSize: '16px',
+        position: 'topRight',
+        message: 'End of page!😢'
+      })
+    }
+  }
 }

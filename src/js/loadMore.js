@@ -10,15 +10,15 @@ function show(btnMore) {
 
 }
 
-function disable(btnMore) {
+function disable(btnMore,) {
   btnMore.disabled = true;
-  // spinner.classList.remove(hiddenClass)
+  // loadTime.classList.remove(hiddenClass)
 
 }
 
-function enable(btnMore) {
+function enable(btnMore,) {
   btnMore.disabled = false;
-  // spinner.classList.add(hiddenClass)
+  // loadTime.classList.add(hiddenClass)
 
 }
 
