@@ -18,9 +18,12 @@ const params = {
   maxPage: ''
 }
 
-
+const bottomSpin = document.querySelector('.bottom-spin')
 const spin = document.querySelector('.loader')
+
+
 spin.style.opacity = 0;
+bottomSpin.style.opacity = 0;
 
 const btnMore = document.querySelector('.page-btn')
 buttonService.hide(btnMore)
@@ -102,6 +105,14 @@ async function returnImg(data) {
     fetchError()
   } else {
     renderImg(hits)
+    const galleryItems = document.querySelector('.gallery-item');
+    const cardHeight = galleryItems.getBoundingClientRect().height;
+
+    console.log(cardHeight)
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: "smooth",
+    });
   }
 
   galleryShow.on('show.simplelightbox', function () {
@@ -129,12 +140,13 @@ function fetchError() {
 async function handleLoadMore() {
   params.page += 1;
   buttonService.disable(btnMore);
+  bottomSpin.style.opacity = 1;
 
   try {
 
     const { hits } = await searchImg(params)
     returnImg({ hits })
-
+    bottomSpin.style.opacity = 0;
   } catch (error) {
     fetchError(error)
   } finally {
@@ -142,12 +154,12 @@ async function handleLoadMore() {
     if (params.page === params.maxPage) {
       buttonService.hide(btnMore)
       btnMore.removeEventListener('click', handleLoadMore)
-      iziToast.show({
-        backgroundColor: '#eecf04',
+      iziToast.info({
+        backgroundColor: '#7453d7',
         messageColor: '#fff',
         messageSize: '16px',
-        position: 'topRight',
-        message: 'End of page!😢'
+        position: 'bottomCenter',
+        message: "We're sorry, but you've reached the end of search results."
       })
     }
   }
