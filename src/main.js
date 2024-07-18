@@ -108,7 +108,6 @@ async function returnImg(data) {
     const galleryItems = document.querySelector('.gallery-item');
     const cardHeight = galleryItems.getBoundingClientRect().height;
 
-    console.log(cardHeight)
     window.scrollBy({
       top: cardHeight * 2,
       behavior: "smooth",
