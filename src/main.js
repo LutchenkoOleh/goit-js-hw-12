@@ -22,8 +22,6 @@ const params = {
 const bottomSpin = document.querySelector('.bottom-spin');
 const spin = document.querySelector('.loader');
 
-
-
 spin.style.opacity = 0;
 bottomSpin.style.opacity = 0;
 
@@ -100,13 +98,9 @@ let galleryShow = new SimpleLightbox('.gallery a', {
 
 
 // !RETURN IMG
-async function returnImg() {
+function returnImg({ hits }) {
 
-  const { hits,
-    totalHits } = await searchImg(params)
-
-
-  if (totalHits === 0) {
+  if (hits.length === 0) {
     fetchError()
   } else {
     renderImg(hits)
@@ -140,10 +134,8 @@ async function handleLoadMore() {
   bottomSpin.style.opacity = 1;
 
   try {
-
-    const { hits } = await searchImg()
+    const { hits } = await searchImg(params)
     returnImg({ hits })
-
 
     const galleryItems = document.querySelector('.gallery-item');
     const cardHeight = galleryItems.getBoundingClientRect().height;

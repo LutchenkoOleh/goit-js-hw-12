@@ -26,4 +26,3 @@ export async function searchImg({
 
   return axiosItem.data;
 }
-
