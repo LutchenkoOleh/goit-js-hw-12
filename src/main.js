@@ -1,13 +1,13 @@
-import './js/render-functions'
-import './js/pixabay-api'
+import './js/render-functions';
+import './js/pixabay-api';
 import SimpleLightbox from "simplelightbox";
 
 
 import iziToast from "izitoast";
-import { searchImg } from './js/pixabay-api'
-import { renderImg } from './js/render-functions'
+import { searchImg } from './js/pixabay-api';
+import { renderImg } from './js/render-functions';
 
-import buttonService from "./js/loadMore"
+import buttonService from "./js/loadMore";
 
 
 
@@ -16,17 +16,21 @@ const params = {
   page: 1,
   per_page: 15,
   maxPage: ''
-}
+};
 
-const bottomSpin = document.querySelector('.bottom-spin')
-const spin = document.querySelector('.loader')
+
+const bottomSpin = document.querySelector('.bottom-spin');
+const spin = document.querySelector('.loader');
+
 
 
 spin.style.opacity = 0;
 bottomSpin.style.opacity = 0;
 
-const btnMore = document.querySelector('.page-btn')
-buttonService.hide(btnMore)
+const btnMore = document.querySelector('.page-btn');
+btnMore.addEventListener('click', handleLoadMore);
+
+buttonService.hide(btnMore);
 
 
 // !HANDLE SEARCH
@@ -59,7 +63,7 @@ async function handelSearch(e) {
 
   }
 
-  buttonService.show(btnMore)
+  buttonService.show(btnMore);
   buttonService.disable(btnMore)
 
   try {
@@ -71,7 +75,6 @@ async function handelSearch(e) {
 
     if (hits.length > 0 && hits.length !== totalHits) {
       buttonService.enable(btnMore);
-      btnMore.addEventListener('click', handleLoadMore)
     } else {
       buttonService.hide(btnMore)
     }
@@ -95,23 +98,18 @@ let galleryShow = new SimpleLightbox('.gallery a', {
 });
 
 
+
 // !RETURN IMG
-async function returnImg(data) {
+async function returnImg() {
 
   const { hits,
     totalHits } = await searchImg(params)
+
 
   if (totalHits === 0) {
     fetchError()
   } else {
     renderImg(hits)
-    const galleryItems = document.querySelector('.gallery-item');
-    const cardHeight = galleryItems.getBoundingClientRect().height;
-
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: "smooth",
-    });
   }
 
   galleryShow.on('show.simplelightbox', function () {
@@ -143,8 +141,17 @@ async function handleLoadMore() {
 
   try {
 
-    const { hits } = await searchImg(params)
+    const { hits } = await searchImg()
     returnImg({ hits })
+
+
+    const galleryItems = document.querySelector('.gallery-item');
+    const cardHeight = galleryItems.getBoundingClientRect().height;
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: "smooth",
+    });
     bottomSpin.style.opacity = 0;
   } catch (error) {
     fetchError(error)

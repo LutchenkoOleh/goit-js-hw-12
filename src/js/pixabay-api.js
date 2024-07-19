@@ -15,7 +15,7 @@ export async function searchImg({
   const safeSearch = true;
 
 
-  return await axios.get(`${URL}&image_type=${imageType}&orientation=${orientation}&safesearch=${safeSearch}`,
+  const axiosItem = await axios.get(`${URL}&image_type=${imageType}&orientation=${orientation}&safesearch=${safeSearch}`,
     {
       params: {
         q,
@@ -23,5 +23,7 @@ export async function searchImg({
         per_page
       }
     })
-    .then(({ data }) => data)
+
+  return axiosItem.data;
 }
+
